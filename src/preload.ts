@@ -9,6 +9,7 @@ window.addEventListener("DOMContentLoaded", () => {
   };
 
   for (const type of ["chrome", "node", "electron"]) {
+    // eslint-disable-next-line no-undef
     replaceText(`${type}-version`, process.versions[type as keyof NodeJS.ProcessVersions] || '');
   }
 });
