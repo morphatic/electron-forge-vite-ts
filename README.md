@@ -1,6 +1,6 @@
 # Sample Electron Forge Project with Vite, TypeScript, Playwright, and Axe
 
-This is a <abbr title="proof of concept">POC</abbr> sample project designed to verify that the following components can all be made to work together:
+This is a POC sample project designed to verify that the following components can all be made to work together:
 
 * Electron Forge: for converting web apps into multi-platform desktop apps
 * Vite: fast build tool for transpiling the app during development (replaces Webpack)

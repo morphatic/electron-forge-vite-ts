@@ -36,6 +36,8 @@
     "skipLibCheck": true
   },
   "include": [
-    "src"
+    "src",
+    "tests",
+    "utilities"
   ]
 }

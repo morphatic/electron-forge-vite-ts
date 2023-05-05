@@ -90,3 +90,9 @@ typings/
 
 # Electron-Forge
 out/
+
+# Project-specific
+screenshots/
+test-results/
+json-output/
+csv-output/

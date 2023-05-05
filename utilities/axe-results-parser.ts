@@ -11,7 +11,7 @@
 import { createHash } from 'crypto'
 import axe from 'axe-core'
 import { Page, TestInfo } from '@playwright/test'
-import { Parser } from '@json2csv/plainjs'
+// import { Parser } from '@json2csv/plainjs'
 
 interface GlobalProperties {
   engine: string
@@ -96,36 +96,40 @@ export const axeViolationsToCsv = async (res: axe.AxeResults, page: Page, slug: 
         helpUrl: result.helpUrl,
       }
       for (const node of result.nodes) {
-        const related = node.any[0].relatedNodes && node.any[0].relatedNodes[0] || undefined
-        const issueProps: IssueProperties = {
-          impact: node.impact,
-          message: node.any[0].message,
-          target: node.target[0],
-          parent: related && related.target[0],
-          failureSummary: node.failureSummary,
-        }
-        const issue = { ...globalProps, ...catProps, ...issueProps }
-        // get the CSS locator of the element with the issue
-        const loc = issue.parent || issue.target
-        if (loc && !issue.rule.includes('empty')) {
-          try {
-            const ts = (new Date(issue.timestamp)).getTime()
-            const path = `screenshots/${ts}/${issue.type}/${browser}/` + getScreenshotPath(issue, slug)
-            await page.locator(loc).screenshot({ path })
-            issue.screenshot = path
-            await info.attach(`${issue.rule} (${issue.impact})`, { contentType: 'image/png', path })
-          } catch (e: unknown) {
-            const body = typeof e === 'string' ? e : e instanceof Error ? e.message : 'Unknown error'
-            await info.attach(`Error: ${issue.rule} (${issue.impact})`, { contentType: 'text/plain', body })
+        const n = node.any[0] || node.all[0] || node.none[0]
+        if (n !== undefined) {
+          const related = n.relatedNodes && n.relatedNodes[0]
+          const issueProps: IssueProperties = {
+            impact: node.impact,
+            message: n.message,
+            target: node.target[0],
+            parent: related && related.target[0],
+            failureSummary: node.failureSummary,
           }
+          const issue = { ...globalProps, ...catProps, ...issueProps }
+          // get the CSS locator of the element with the issue
+          const loc = issue.parent || issue.target
+          if (loc && !issue.rule.includes('empty')) {
+            try {
+              const ts = (new Date(issue.timestamp)).getTime()
+              const path = `screenshots/${ts}/${issue.type}/${browser}/` + getScreenshotPath(issue, slug)
+              await page.locator(loc).screenshot({ path })
+              issue.screenshot = path
+              await info.attach(`${issue.rule} (${issue.impact})`, { contentType: 'image/png', path })
+            } catch (e: unknown) {
+              const body = typeof e === 'string' ? e : e instanceof Error ? e.message : 'Unknown error'
+              await info.attach(`Error: ${issue.rule} (${issue.impact})`, { contentType: 'text/plain', body })
+            }
+          }
+          issues.push(issue)
         }
-        issues.push(issue)
       }
     }
 
-    const parser = new Parser({ header })
-    const csv = parser.parse(issues)
-    return csv + '\n'
+    // const parser = new Parser({ header })
+    // const csv = parser.parse(issues)
+    // return csv + '\n'
+    return JSON.stringify(issues, null, 2)
   }
 }
 
