@@ -5,6 +5,9 @@ import {
 } from 'electron-playwright-helpers'
 import type { ElectronApplication, Page } from 'playwright'
 import { _electron as electron } from 'playwright'
+import AxeBuilder from '@axe-core/playwright'
+import { writeFileSync } from 'fs'
+import { axeViolationsToCsv } from '../utilities/axe-results-parser'
 
 let app: ElectronApplication
 let page: Page
@@ -41,4 +44,16 @@ test('renders the first page', async () => {
   const h1 = await page.getByRole('heading')
   const text = await h1.innerText()
   expect(text).toContain('Hello World!')
+})
+
+test('accessibility', async () => {
+  page = await app.firstWindow()
+  await page.waitForLoadState('domcontentloaded')
+  const results = await new AxeBuilder({ page }).analyze()
+  expect(results.violations.length).toBe(0)
+  const csv = await axeViolationsToCsv(results, page, 'a11y test', 'chromium', true, test.info())
+  const ts = (new Date()).getTime()
+  const path = `csv-output/${ts}-a11y-violations.csv`
+  writeFileSync(path, csv)
+  await test.info().attach('a11y-violations.csv', { contentType: 'text/csv', path })
 })
