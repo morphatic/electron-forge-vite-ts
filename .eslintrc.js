@@ -28,5 +28,7 @@ module.exports = {
   /**
    * Rules override configs from `extends` section above
    */
-  rules: {}
+  rules: {
+    '@typescript-eslint/consistent-type-imports': 'error',
+  }
 }

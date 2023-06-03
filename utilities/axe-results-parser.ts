@@ -9,9 +9,10 @@
  */
 
 import { createHash } from 'crypto'
-import axe from 'axe-core'
-import { Page, TestInfo } from '@playwright/test'
-import { Parser } from '@json2csv/plainjs'
+import type axe from 'axe-core'
+import type { Page, TestInfo } from '@playwright/test'
+import { Parser } from '@json2csv/plainjs/dist/cjs'
+// import { Parser } from '@json2csv/plainjs' // <== this is the correct import, but it doesn't work; resolves to mjs version; problem is Playwright
 
 interface GlobalProperties {
   engine: string
@@ -153,4 +154,4 @@ export const getViolationCountBySeverity = (res: axe.AxeResults, severity: strin
  * @param   {string} val The value to be hashed
  * @returns {string}     A likely unique hashed value
  */
-const shake = (val: string) => createHash('shake256', { outputLength: 4 }).update(val).digest('hex')
+const shake = (val: string): string => createHash('shake256', { outputLength: 4 }).update(val).digest('hex')
